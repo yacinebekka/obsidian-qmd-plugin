@@ -1,15 +1,16 @@
 # Obsidian QMD Plugin
 
-Plugin that allow to works with .qmd file in Obsidian by adding two custom command :
+This plugin allows you to work with .qmd files in Obsidian by adding two custom commands:
 
-- Convert QMD to MD : Flag all .qmd files in the vault, converts them to .md and update all links going to those .qmd file to point to new .md path
-- Convert MD to QMD : Converts back files to .qmd and reupdate the links to point to .qmd
+- Convert QMD to MD: Flags all .qmd files in the vault, converts them to .md, and updates all links pointing to those .qmd files to point to the new .md paths.
+- Convert MD to QMD: Converts files back to .qmd and updates the links to point to the .qmd paths.
 
-This allow to create/modify .qmd file in Obsidian and also to visualize them in the graph view.
+This enables you to create, modify, and visualize .qmd files in Obsidian, including in the graph view.
 
-In order for the plugin to works optimally i recommedn the below settings :
+For the plugin to work optimally, I recommend the following settings:
+
 - Options -> Editor -> Properties in document -> Visible
 - Options -> Files and links -> Use [[Wikilinks]] -> False
 - Options -> Files and links -> Detect all file extensions -> True
 
-Note : Those custom command might be slow if have larger number of files in the vault.
+Note: These custom commands might be slow if you have a large number of files in the vault.
