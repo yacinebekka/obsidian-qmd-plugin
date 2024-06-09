@@ -19,4 +19,4 @@ Note: These custom commands might be slow if you have a large number of files in
 
 1. Download the source from this github repo
 2. Move the the source into .obsidian/plugins
-3. Run npm install and npm run dev to install and build the plugin
+3. Run ```npm install``` and ```npm run dev``` to install and build the plugin
