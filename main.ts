@@ -1,8 +1,24 @@
-import { Plugin, TFile, Notice } from 'obsidian';
+import { Plugin, PluginSettingTab, App, Setting, TFile, Notice } from 'obsidian';
+
+
+interface QuartoPluginSettings {
+    targetFolder: string;
+}
+
+const DEFAULT_SETTINGS: QuartoPluginSettings = {
+    targetFolder: '' // Default folder path
+};
+
 
 export default class QuartoPlugin extends Plugin {
+    settings: QuartoPluginSettings;
+
     async onload() {
+        await this.loadSettings();
         this.registerExtensions(['qmd'], 'markdown');
+
+        this.addSettingTab(new QuartoSettingTab(this.app, this))
+        
         this.addCommand({
             id: 'rename-qmd-to-md',
             name: 'Convert QMD to MD',
@@ -16,8 +32,18 @@ export default class QuartoPlugin extends Plugin {
         });
     }
 
+    async loadSettings() {
+        this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
+    }
+
+    async saveSettings() {
+        await this.saveData(this.settings);
+    }
+
     async renameQmdToMd() {
-        const files = this.app.vault.getFiles();
+        console.log(this.settings.targetFolder)
+        const files = this.app.vault.getFiles().filter(file => file.path.startsWith(this.settings.targetFolder));
+        console.log(this.app.vault.getFiles())
         let linksToUpdate = new Map();
 
         // First collect all qmd files and prepare new paths
@@ -35,6 +61,7 @@ export default class QuartoPlugin extends Plugin {
             let modified = false;
 
             // Update links in all files
+            console.log(linksToUpdate)
             linksToUpdate.forEach((newPath, oldPath) => {
                 let linkRegex = new RegExp(`\\[\\[(${this.escapeRegex(oldPath.replace(/\.qmd$/, ''))})(\\|[^\\]]+)?\\]\\]`, 'g');
 
@@ -71,7 +98,7 @@ export default class QuartoPlugin extends Plugin {
     }
 
     async convertMdToQmd() {
-        const files = this.app.vault.getFiles();
+        const files = this.app.vault.getFiles().filter(file => file.path.startsWith(this.settings.targetFolder));
         let linksToUpdate = new Map();
 
         // First collect all md files marked as isQMD and prepare new paths
@@ -119,6 +146,31 @@ export default class QuartoPlugin extends Plugin {
 
     escapeRegex(string) {
         return string.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+    }
+}
+
+class QuartoSettingTab extends PluginSettingTab {
+    plugin: QuartoPlugin;
+
+    constructor(app: App, plugin: QuartoLoPlugin) {
+        super(app, plugin);
+    }
+
+    display(): void {
+        const {containerEl} = this;
+        containerEl.empty();
+
+        containerEl.createEl('h2', {text: 'QMD Plugin Settings'});
+
+        new Setting(containerEl)
+            .setName('Target Folder')
+            .setDesc('Enter the folder path within the vault where the plugin should operate.')
+            .addText(text => text
+                .setValue(this.plugin.settings.targetFolder)
+                .onChange(async (value) => {
+                    this.plugin.settings.targetFolder = value.trim();
+                    await this.plugin.saveSettings();
+                }));
     }
 }
 
